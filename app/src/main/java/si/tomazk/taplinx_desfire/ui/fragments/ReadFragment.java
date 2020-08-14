@@ -28,8 +28,9 @@ import javax.crypto.spec.SecretKeySpec;
 import si.tomazk.taplinx_desfire.R;
 
 import static si.tomazk.taplinx_desfire.SampleAppKeys.MY_APP;
-import static si.tomazk.taplinx_desfire.SampleAppKeys.DEFAULT_KEY_2KTDES;
-import static si.tomazk.taplinx_desfire.SampleAppKeys.NEW_KEY_2KTDES;
+import static si.tomazk.taplinx_desfire.SampleAppKeys.DEFAULT_KEY_3DES;
+import static si.tomazk.taplinx_desfire.SampleAppKeys.MY_KEY_AES128;
+import static si.tomazk.taplinx_desfire.SampleAppKeys.NEW_KEY_3DES;
 
 public class ReadFragment extends Fragment {
 
@@ -78,44 +79,87 @@ public class ReadFragment extends Fragment {
 
             case DESFireEV2:
                 Log.i(TAG, "DESFireEV2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                desfireEV2ReadCardLogic(desFireFactory.getInstance().getDESFireEV2(libInstance.getCustomModules()));
+
+                IDESFireEV2 desFireEV2 = desFireFactory.getInstance().getDESFireEV2(libInstance.getCustomModules());
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(getString(R.string.Card_Detected)).append(desFireEV2.getType().getTagName());
+                stringBuilder.append("\n\n");
+
+                mTvLabel.setText(stringBuilder.toString());
+
+                if(DESFireEV2Auth(desFireEV2, mTvLabel) == 1)
+                {
+                    desfireEV2ReadCardLogic(desFireEV2, mTvLabel);
+                }
+
                 break;
         }
     }
 
-    private void desfireEV2ReadCardLogic(IDESFireEV2 desFireEV2) {
+    private int DESFireEV2Auth(IDESFireEV2 desFireEV2, TextView log) {
+
+        KeyData myAesKeyData = new KeyData();
+        myAesKeyData.setKey(new SecretKeySpec(MY_KEY_AES128, "AES"));
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            stringBuilder.append(getString(R.string.Selecting_PICC));
+            stringBuilder.append("\n");
+            desFireEV2.selectApplication(0);
+
+            stringBuilder.append(getString(R.string.PICC_selection_success));
+            stringBuilder.append("\n");
+
+            stringBuilder.append(getString(R.string.Auth_with_custom_aes_key));
+            stringBuilder.append("\n");
+
+            desFireEV2.authenticate(0, IDESFireEV1.AuthType.AES, KeyType.AES128, myAesKeyData);
+            stringBuilder.append(getString(R.string.Auth_with_custom_aes_key_success));
+            stringBuilder.append("\n\n");
+
+
+        } catch (Exception e) {
+            stringBuilder.append("-----Exception------");
+            stringBuilder.append("\n\n");
+            stringBuilder.append(e.getMessage());
+            stringBuilder.append("\n\n");
+            log.append(stringBuilder.toString());
+            return 0;
+        }
+
+        log.append(stringBuilder.toString());
+        return  1;
+    }
+
+
+    private void desfireEV2ReadCardLogic(IDESFireEV2 desFireEV2, TextView log) {
         int fileSize = 100;
-        byte[] data = new byte[]{0x11, 0x11, 0x11, 0x11, 0x11};
         int timeOut = 2000;
         int fileNo = 0;
 
+        KeyData defDesKeyData = new KeyData();
+        defDesKeyData.setKey(new SecretKeySpec(DEFAULT_KEY_3DES, "DESede"));
+
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(getString(R.string.Card_Detected)).append(desFireEV2.getType().getTagName());
-        stringBuilder.append("\n\n");
         try {
 
-            Key defKey = new SecretKeySpec(DEFAULT_KEY_2KTDES, "DeSade");
-            KeyData defKeyData = new KeyData();
-            defKeyData.setKey(defKey);
-
             stringBuilder.append(getString(R.string.Selecting_MY_APP));
+            stringBuilder.append("\n");
             desFireEV2.selectApplication(MY_APP);
-            stringBuilder.append("\n\n");
-
             stringBuilder.append(getString(R.string.MY_APP_selection_success));
-            stringBuilder.append("\n\n");
-            
-            Key newKey = new SecretKeySpec(NEW_KEY_2KTDES, "DeSade");
-            KeyData newKeyData = new KeyData();
-            newKeyData.setKey(defKey);
+            stringBuilder.append("\n");
 
             stringBuilder.append(getString(R.string.Auth_with_default_key));
-            stringBuilder.append("\n\n");
-            desFireEV2.authenticate(0, IDESFireEV1.AuthType.Native, KeyType.TWO_KEY_THREEDES, newKeyData);
-            stringBuilder.append(getString(R.string.Authentication_status_true));
-            stringBuilder.append("\n\n");
+            stringBuilder.append("\n");
 
-            stringBuilder.append(getString(R.string.Data_read_from_the_card)).append(Utilities.dumpBytes(desFireEV2.readData(0, 0, 5)));
+            desFireEV2.authenticate(0, IDESFireEV1.AuthType.Native, KeyType.THREEDES, defDesKeyData);
+            stringBuilder.append(getString(R.string.Auth_with_default_key_success));
+            stringBuilder.append("\n");
+
+            stringBuilder.append("\n");
+            stringBuilder.append(getString(R.string.Data_read_from_the_card)).append(Utilities.dumpBytes(desFireEV2.readData(0, 0, 15)));
             stringBuilder.append("\n\n");
 
             desFireEV2.getReader().close();
@@ -133,7 +177,7 @@ public class ReadFragment extends Fragment {
             stringBuilder.append("\n\n");
         }
 
-        mTvLabel.setText(stringBuilder.toString());
+        mTvLabel.append(stringBuilder.toString());
         NxpLogUtils.save();
     }
 }

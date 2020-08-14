@@ -159,13 +159,20 @@
     <string name="Selecting_MY_APP">Selecting MY_APP </string>
     <string name="MY_APP_selection_success">Selected MY_APP successfully !!!</string>
     <string name="Auth_with_default_key">Authenticating with default key...</string>
+    <string name="Auth_with_default_key_success">Authenticating with default key successfully !!!</string>
+    <string name="Auth_with_custom_aes_key">Authenticating with custom aes key...</string>
+    <string name="Auth_with_custom_aes_key_success">Authenticating with custom aes key successfully !!!</string>
     <string name="Creating_application">Creating application...</string>
     <string name="Formatting_card">Formatting card ...</string>
-    <string name="Formatted_card_successfully">Formatted card successfully!!!</string>
+    <string name="This_card_is_empty">This card is empty</string>
+    <string name="Formatted_card_success">Formatted card successfully!!!</string>
     <string name="App_creation_success">Application created successfully with ID: </string>
-    <string name="Writing_data_to_tag">Writing data to tag...</string>
+    <string name="Writing_data_to_file">Writing data to file...</string>
     <string name="Writing_data_to_Default_file">Writing data to Default file...</string>
     <string name="Writing_single_block">Writing single block...</string>
-    <string name="Unable_to_perfom_to_operation">Unable to perform write operation on tag !!!
-    </string>
+    <string name="Unable_to_perfom_to_operation">Unable to perform write operation on tag !!!</string>
+    <string name="Change_PICC_key">Change PICC key</string>
+    <string name="Change_PICC_key_success">Change PICC key successfully !!!</string>
+    <string name="Creating_file">Creating file ...</string>
+    <string name="Creating_file_success">Creating file successfully !!!</string>
 </resources>

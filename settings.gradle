@@ -1,0 +1,7 @@
+include ':app', ':nxpnfcandroidlib-1.7'
+rootProject.name='TapLinx_DESFire'
+
+
+
+
+
